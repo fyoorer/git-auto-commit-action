@@ -18,21 +18,13 @@ EOF
     git config --global user.name "GitHub Actions"
 }
 
+git_setup
 
-# This section only runs if there have been file changes
-echo "Checking for uncommitted changes in the git working tree."
-if ! git diff --quiet
-then
-    git_setup
+# Switch to branch from current Workflow run
+git checkout "${GITHUB_REF:11}"
 
-    # Switch to branch from current Workflow run
-    git checkout "${GITHUB_REF:11}"
+git add .
 
-    git add .
+git commit -m "$INPUT_COMMIT_MESSAGE" --author="$INPUT_COMMIT_AUTHOR_NAME <$INPUT_COMMIT_AUTHOR_EMAIL>"
 
-    git commit -m "$INPUT_COMMIT_MESSAGE" --author="$INPUT_COMMIT_AUTHOR_NAME <$INPUT_COMMIT_AUTHOR_EMAIL>"
-
-    git push --set-upstream origin "${GITHUB_REF:11}"
-else
-    echo "Working tree clean. Nothing to commit."
-fi
+git push --set-upstream origin "${GITHUB_REF:11}"
